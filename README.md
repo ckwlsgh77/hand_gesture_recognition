@@ -17,5 +17,14 @@ CUDA 10.0, cuDNN 7.6.2 , openpose
 
 
 --------------------------------------------------------
+
 Yolov3 를 통해 Hand detection을 수행하고 
 이후 Openopse를 사용한 버전
+
+Language : C++
+
+Library : OpenCV 4.2.0
+
+CUDA 10.0, cuDNN 7.6.2 , openpose, yolov3
+
+
