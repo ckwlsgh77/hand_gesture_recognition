@@ -8,7 +8,7 @@ Language : C++
 
 Library : OpenCV 4.2.0
 
-CUDA 10.0, cuDNN 7.6.2 , openpose
+CUDA 10.0, cuDNN 7.6.2 , openpose(pre-trained)
 
 실행 영상 : https://www.youtube.com/watch?v=8wDcC4KRxPE
 
@@ -25,6 +25,6 @@ Language : C++
 
 Library : OpenCV 4.2.0
 
-CUDA 10.0, cuDNN 7.6.2 , openpose, yolov3
+CUDA 10.0, cuDNN 7.6.2 , openpose(pre-trained), yolov3(fine-tuning)
 
 
