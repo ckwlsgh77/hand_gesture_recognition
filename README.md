@@ -19,7 +19,7 @@ CUDA 10.0, cuDNN 7.6.2 , openpose(pre-trained)
 --------------------------------------------------------
 
 Yolov3 를 통해 Hand detection을 수행하고 
-이후 Openopse를 사용한 버전
+이후 Openopse를 사용한 버전 (개발중)
 
 Language : C++
 
