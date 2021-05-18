@@ -45,8 +45,8 @@ static bool is_running;
 
 int main() {
 
-	cv::String protoFile = "hand/pose_deploy.prototxt";
-	cv::String weightsFile = "hand/pose_iter_102000.caffemodel";
+	cv::String protoFile = "openpose/models/hand/pose_deploy.prototxt";
+	cv::String weightsFile = "openpose/models/hand/pose_iter_102000.caffemodel";
 
 	cv::dnn::Net net = cv::dnn::readNetFromCaffe(protoFile, weightsFile);
 	net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
@@ -304,7 +304,7 @@ cv::Point current_cursor;
 int click_count = 0;
 par before_state;
 
-#define TWO_STEP_MOVEMENT_SPEED
+#define TWO_STEP_MOVEMENT_SPEED //천천히 움직이다가 클릭
 
 void DoAction(par state) {
 	if (before_state.count == 4 && click_count > 3 && state.count != 4) {
@@ -335,7 +335,7 @@ void DoAction(par state) {
 			}
 		}
 		click_count++;
-#else
+#else // 손을 떼는순간 클릭
 		if (click_count > 3) {
 			SendLeftDown();
 
@@ -428,7 +428,7 @@ void SendLeftUp() {
 
 
 void move_cursor(cv::Point cur) {
-#if 1
+
 	POINT current_cursor;
 	GetCursorPos(&current_cursor);
 
@@ -494,7 +494,5 @@ void move_cursor(cv::Point cur) {
 	}
 
 
-
-#endif 
 	SetCursorPos(cur.x, cur.y);
 }
