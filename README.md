@@ -3,6 +3,7 @@ openpose만 사용한 버전
 ![image](https://user-images.githubusercontent.com/43734014/114185550-d26aa480-9980-11eb-90ba-b8ce17e07d1a.png)
 
 ![image](https://user-images.githubusercontent.com/43734014/114185699-f8904480-9980-11eb-93e5-c0e874ad9553.png)
+1 2 4 3 순서
 
 Language : C++
 
