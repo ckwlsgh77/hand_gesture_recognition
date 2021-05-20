@@ -93,11 +93,11 @@ int main() {
 				Sleep(500);
 			}
 			else {
-				constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
+				//constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
 
-				auto starting_point = std::chrono::system_clock::now();
+				//auto starting_point = std::chrono::system_clock::now();
 				current_state = HandGestureRecognition(net);
-				std::this_thread::sleep_until(starting_point + kMinimumIntervalMs);
+				//std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
 			}
 
 			if (current_state.check == 1) {
@@ -130,7 +130,7 @@ void detector_thread(cv::dnn::Net net) {
 
 	while (!is_thread_terminated) {
 
-		std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+		//std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
 		cv::Mat clone_frame = frame.clone();
 
@@ -145,9 +145,9 @@ void detector_thread(cv::dnn::Net net) {
 
 		blob = output.clone();
 
-		std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
+		//std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
 
-		std::cout << "시간(초) : " << sec.count() << " seconds" << std::endl;
+		//std::cout << "시간(초) : " << sec.count() << " seconds" << std::endl; // release 0.16 debug 0.19
 
 	}
 
