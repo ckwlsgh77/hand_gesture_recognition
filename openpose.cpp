@@ -39,7 +39,7 @@ par before_ret;
 cv::Point cursor;
 cv::Point before_point = { 0,0 };
 cv::Mat frame;
-cv::Mat blob;
+cv::Mat result;
 static bool is_thread_terminated;
 static bool is_running;
 
@@ -96,6 +96,7 @@ int main() {
 				//constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
 
 				//auto starting_point = std::chrono::system_clock::now();
+				//detector_thread(net);
 				current_state = HandGestureRecognition(net);
 				//std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
 			}
@@ -137,13 +138,13 @@ void detector_thread(cv::dnn::Net net) {
 		int frameWidth = clone_frame.cols;
 		int frameHeight = clone_frame.rows;
 
-		cv::Mat inpBlob = cv::dnn::blobFromImage(clone_frame, 1.0 / 255, cv::Size(frameWidth, frameHeight), cv::Scalar(0, 0, 0), false, false);
+		cv::Mat inpBlob = cv::dnn::blobFromImage(clone_frame, 1.0 / 255, cv::Size(frameWidth, frameHeight), cv::Scalar(0, 0, 0), false, false); //이미지전처리 1/255 정규화
 
 		net.setInput(inpBlob);
 
 		cv::Mat output = net.forward();
 
-		blob = output.clone();
+		result = output.clone();
 
 		//std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
 
@@ -159,11 +160,9 @@ par HandGestureRecognition(cv::dnn::Net net) {
 
 	cv::Mat frameCopy = frame.clone();
 	//cv::resize(frameCopy, frameCopy, cv::Size(620, 460));
-	int H = blob.size[2];
-	int W = blob.size[3];
+	int H = result.size[2]; 
+	int W = result.size[3];
 	
-	
-
 	int frameWidth = frameCopy.cols;
 	int frameHeight = frameCopy.rows;
 
@@ -179,9 +178,9 @@ par HandGestureRecognition(cv::dnn::Net net) {
 	for (int n = 0; n < nPoints; n++)
 	{
 
-		cv::Mat probMap(H, W, CV_32F, blob.ptr(0, n));
-		
-		minMaxLoc(probMap, 0, &prob, 0, &maxLoc);
+		cv::Mat probMap(H, W, CV_32F, result.ptr(0, n)); //n번째 keypoint의 heatmap
+		//std::cout << *result.ptr(0, n) << std::endl;
+		minMaxLoc(probMap, 0, &prob, 0, &maxLoc); //heatmap 최대값 위치
 
 
 	//	if (probMap.cols > 0 && probMap.rows > 0) {
@@ -481,8 +480,8 @@ void move_cursor(cv::Point cur) {
 		if (div_q < 0)
 			div_q = 1;	
 
-		w = (double)p / (double)q;
-		m = -1 * (w*current_cursor.x - current_cursor.y);
+		w = (double)p / (double)q; // 기울기
+		m = -1 * (w*current_cursor.x - current_cursor.y); // y = wx + m --> m = -(wx-y)
 
 		
 
