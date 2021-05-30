@@ -4,7 +4,8 @@
 #include <cmath>
 #include <thread>
 #include <Windows.h>
-
+#include <mutex>
+#include <condition_variable>
 typedef struct point_and_ret {
 	std::vector<cv::Point> points;
 	int count = 0;
@@ -40,8 +41,15 @@ cv::Point cursor;
 cv::Point before_point = { 0,0 };
 cv::Mat frame;
 cv::Mat result;
-static bool is_thread_terminated;
-static bool is_running;
+bool is_thread_terminated;
+bool is_running;
+
+std::mutex mu;
+std::condition_variable convar;
+
+std::mutex result_mu;
+std::condition_variable result_convar;
+
 
 int main() {
 
@@ -90,15 +98,17 @@ int main() {
 			if (!is_running) {
 				is_running = true;
 				is_thread_terminated = false;
-				Sleep(500);
+				convar.notify_one();
 			}
 			else {
-				constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
+				//constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
 
-				auto starting_point = std::chrono::system_clock::now();
+				//auto starting_point = std::chrono::system_clock::now();
 				//detector_thread(net);
+
 				current_state = HandGestureRecognition(net);
-				std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
+
+				//std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
 			}
 
 			if (current_state.check == 1) {
@@ -125,9 +135,14 @@ int main() {
 }
 
 void detector_thread(cv::dnn::Net &net) {
+
+	std::unique_lock<std::mutex> ulock(mu);
+
 	while (!is_running) {
-		Sleep(50);
+		convar.wait(ulock);
 	}
+
+	bool first = false;
 
 	while (!is_thread_terminated) {
 
@@ -145,7 +160,11 @@ void detector_thread(cv::dnn::Net &net) {
 		cv::Mat output = net.forward();
 
 		result = output.clone();
-
+		
+		if (first == false) {
+			result_convar.notify_one();
+			first = true;
+		}
 		//std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
 
 		//std::cout << "시간(초) : " << sec.count() << " seconds" << std::endl; // release 0.16 debug 0.19
@@ -155,11 +174,20 @@ void detector_thread(cv::dnn::Net &net) {
 }
 
 int count = 0;
-par HandGestureRecognition(cv::dnn::Net &net) {
-	int nPoints = 21;
 
+par HandGestureRecognition(cv::dnn::Net &net) {
+
+	par ret;
+	int nPoints = 21;
 	cv::Mat frameCopy = frame.clone();
 	//cv::resize(frameCopy, frameCopy, cv::Size(620, 460));
+
+	std::unique_lock<std::mutex> ulock(result_mu);
+
+	while (result.empty()) {
+		result_convar.wait(ulock);
+	}
+
 	int H = result.size[2]; 
 	int W = result.size[3];
 	
@@ -167,8 +195,6 @@ par HandGestureRecognition(cv::dnn::Net &net) {
 	int frameHeight = frameCopy.rows;
 
 	std::vector<cv::Point> points(nPoints);
-	par ret;
-
 	double sum_prob = 0;
 
 	cv::Point maxLoc;
@@ -182,18 +208,6 @@ par HandGestureRecognition(cv::dnn::Net &net) {
 		//std::cout << *result.ptr(0, n) << std::endl;
 		minMaxLoc(probMap, 0, &prob, 0, &maxLoc); //heatmap 최대값 위치
 
-
-	//	if (probMap.cols > 0 && probMap.rows > 0) {
-
-		//	cv::resize(probMap, probMap, cv::Size(480, 360));
-		//	cv::namedWindow("main frame", cv::WINDOW_AUTOSIZE);
-		//	imshow("heatmap", probMap);
-
-		//}
-
-		
-
-
 		if (prob > 0.1)
 		{
 			circle(frameCopy, cv::Point((int)(maxLoc.x * 8), (int)(maxLoc.y * 8)), 4, cv::Scalar(0, 255, 255), -1);
@@ -205,15 +219,9 @@ par HandGestureRecognition(cv::dnn::Net &net) {
 	}
 	
 
-
-
-
 	ret.count = recognition_gesture(ret.points);
 
-
-
 	ret.check = 1;
-
 
 	cv::flip(frameCopy, frameCopy, 1);
 
