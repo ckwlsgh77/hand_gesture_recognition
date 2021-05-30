@@ -98,7 +98,7 @@ int main() {
 			if (!is_running) {
 				is_running = true;
 				is_thread_terminated = false;
-				convar.notify_one();
+				convar.notify_one(); // detector_thread 깨움
 			}
 			else {
 				//constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
@@ -139,7 +139,7 @@ void detector_thread(cv::dnn::Net &net) {
 	std::unique_lock<std::mutex> ulock(mu);
 
 	while (!is_running) {
-		convar.wait(ulock);
+		convar.wait(ulock); // frame이 없으면 재움
 	}
 
 	bool first = false;
@@ -161,7 +161,7 @@ void detector_thread(cv::dnn::Net &net) {
 
 		result = output.clone();
 		
-		if (first == false) {
+		if (first == false) { //처음 일때만 깨움
 			result_convar.notify_one();
 			first = true;
 		}
@@ -184,7 +184,7 @@ par HandGestureRecognition(cv::dnn::Net &net) {
 
 	std::unique_lock<std::mutex> ulock(result_mu);
 
-	while (result.empty()) {
+	while (result.empty()) { //detector thread의 결과가 없으면 재움
 		result_convar.wait(ulock);
 	}
 
