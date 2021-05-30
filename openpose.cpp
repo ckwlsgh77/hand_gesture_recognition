@@ -25,15 +25,15 @@ const int POSE_PAIRS[20][2] = {
 	{ 0,17 },{ 17,18 },{ 18,19 },{ 19,20 }   // small
 };
 
-par HandGestureRecognition(cv::dnn::Net net);
+par HandGestureRecognition(cv::dnn::Net &net);
 void DoAction(par action);
-void detector_thread(cv::dnn::Net net);
+void detector_thread(cv::dnn::Net &net);
 void move_cursor(cv::Point cur);
 void SendLeftDown();
 void SendLeftUp();
 int before_gesture = -1;
 
-int recognition_gesture(std::vector<cv::Point> points);
+int recognition_gesture(std::vector<cv::Point> &points);
 
 par before_ret;
 cv::Point cursor;
@@ -93,12 +93,12 @@ int main() {
 				Sleep(500);
 			}
 			else {
-				//constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
+				constexpr std::chrono::milliseconds kMinimumIntervalMs(35);
 
-				//auto starting_point = std::chrono::system_clock::now();
+				auto starting_point = std::chrono::system_clock::now();
 				//detector_thread(net);
 				current_state = HandGestureRecognition(net);
-				//std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
+				std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //병렬실행을 위해 잠시 멈췄다감
 			}
 
 			if (current_state.check == 1) {
@@ -124,7 +124,7 @@ int main() {
 	return 0;
 }
 
-void detector_thread(cv::dnn::Net net) {
+void detector_thread(cv::dnn::Net &net) {
 	while (!is_running) {
 		Sleep(50);
 	}
@@ -155,7 +155,7 @@ void detector_thread(cv::dnn::Net net) {
 }
 
 int count = 0;
-par HandGestureRecognition(cv::dnn::Net net) {
+par HandGestureRecognition(cv::dnn::Net &net) {
 	int nPoints = 21;
 
 	cv::Mat frameCopy = frame.clone();
@@ -179,7 +179,6 @@ par HandGestureRecognition(cv::dnn::Net net) {
 	{
 
 		cv::Mat probMap(H, W, CV_32F, result.ptr(0, n)); //n번째 keypoint의 heatmap
-		//std::cout << *result.ptr(0, n) << std::endl;
 		minMaxLoc(probMap, 0, &prob, 0, &maxLoc); //heatmap 최대값 위치
 
 
@@ -228,7 +227,7 @@ par HandGestureRecognition(cv::dnn::Net net) {
 	return ret;
 }
 
-int recognition_gesture(std::vector<cv::Point> points) {
+int recognition_gesture(std::vector<cv::Point> &points) {
 
 	bool left = 1;
 
