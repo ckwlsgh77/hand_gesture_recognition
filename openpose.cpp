@@ -63,7 +63,7 @@ int main() {
 	}
 
 	is_running = false;
-	std::thread t1(detector_thread, net); // ≥ª∫Œø°º≠ while µÓ¿ª ≥÷æÓº≠ loop.
+	std::thread t1(detector_thread, net); // ?¥Î??êÏÑú while ?±ÏùÑ ?£Ïñ¥??loop.
 
 
 	while (1)
@@ -98,7 +98,11 @@ int main() {
 				auto starting_point = std::chrono::system_clock::now();
 				//detector_thread(net);
 				current_state = HandGestureRecognition(net);
+<<<<<<< HEAD
 				std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //∫¥∑ƒΩ««‡¿ª ¿ß«ÿ ¿·Ω√ ∏ÿ√Ë¥Ÿ∞®
+=======
+				std::this_thread::sleep_until(starting_point + kMinimumIntervalMs); //Î≥ëÎ†¨?§Ìñâ???ÑÌï¥ ?†Ïãú Î©àÏ∑Ñ?§Í∞ê
+>>>>>>> 32d31a356676db87fe7c891e75539ac67f5a5bda
 			}
 
 			if (current_state.check == 1) {
@@ -138,7 +142,7 @@ void detector_thread(cv::dnn::Net &net) {
 		int frameWidth = clone_frame.cols;
 		int frameHeight = clone_frame.rows;
 
-		cv::Mat inpBlob = cv::dnn::blobFromImage(clone_frame, 1.0 / 255, cv::Size(frameWidth, frameHeight), cv::Scalar(0, 0, 0), false, false); //¿ÃπÃ¡ˆ¿¸√≥∏Æ 1/255 ¡§±‘»≠
+		cv::Mat inpBlob = cv::dnn::blobFromImage(clone_frame, 1.0 / 255, cv::Size(frameWidth, frameHeight), cv::Scalar(0, 0, 0), false, false); //?¥Î?ÏßÄ?ÑÏ≤òÎ¶?1/255 ?ïÍ∑ú??
 
 		net.setInput(inpBlob);
 
@@ -148,7 +152,7 @@ void detector_thread(cv::dnn::Net &net) {
 
 		//std::chrono::duration<double> sec = std::chrono::system_clock::now() - start;
 
-		//std::cout << "Ω√∞£(√ ) : " << sec.count() << " seconds" << std::endl; // release 0.16 debug 0.19
+		//std::cout << "?úÍ∞Ñ(Ï¥? : " << sec.count() << " seconds" << std::endl; // release 0.16 debug 0.19
 
 	}
 
@@ -178,8 +182,14 @@ par HandGestureRecognition(cv::dnn::Net &net) {
 	for (int n = 0; n < nPoints; n++)
 	{
 
+<<<<<<< HEAD
 		cv::Mat probMap(H, W, CV_32F, result.ptr(0, n)); //nπ¯¬∞ keypoint¿« heatmap
 		minMaxLoc(probMap, 0, &prob, 0, &maxLoc); //heatmap √÷¥Î∞™ ¿ßƒ°
+=======
+		cv::Mat probMap(H, W, CV_32F, result.ptr(0, n)); //nÎ≤àÏß∏ keypoint??heatmap
+		//std::cout << *result.ptr(0, n) << std::endl;
+		minMaxLoc(probMap, 0, &prob, 0, &maxLoc); //heatmap ÏµúÎ?Í∞??ÑÏπò
+>>>>>>> 32d31a356676db87fe7c891e75539ac67f5a5bda
 
 
 	//	if (probMap.cols > 0 && probMap.rows > 0) {
@@ -302,7 +312,7 @@ cv::Point current_cursor;
 int click_count = 0;
 par before_state;
 
-#define TWO_STEP_MOVEMENT_SPEED //√µ√µ»˜ øÚ¡˜¿Ã¥Ÿ∞° ≈¨∏Ø
+#define TWO_STEP_MOVEMENT_SPEED //Ï≤úÏ≤ú???ÄÏßÅÏù¥?§Í? ?¥Î¶≠
 
 void DoAction(par state) {
 	if (before_state.count == 4 && click_count > 3 && state.count != 4) {
@@ -333,7 +343,7 @@ void DoAction(par state) {
 			}
 		}
 		click_count++;
-#else // º’¿ª ∂º¥¬º¯∞£ ≈¨∏Ø
+#else // ?êÏùÑ ?ºÎäî?úÍ∞Ñ ?¥Î¶≠
 		if (click_count > 3) {
 			SendLeftDown();
 
@@ -377,7 +387,7 @@ void DoAction(par state) {
 
 		if (click_count > 5) {
 			keybd_event(VK_BACK, 0, KEYEVENTF_EXTENDEDKEY, 0);
-			Sleep(1);   //Ω√∞£ 1ms ¡ˆø¨
+			Sleep(1);   //?úÍ∞Ñ 1ms ÏßÄ??
 			keybd_event(VK_BACK, 0, KEYEVENTF_KEYUP, 0);
 
 			click_count = 0;
@@ -437,7 +447,7 @@ void move_cursor(cv::Point cur) {
 	double w = 0;
 	double m = 0;
 
-	if (q == 0) { //x∞Ì¡§
+	if (q == 0) { //xÍ≥†Ï†ï
 		tmp_cursor.x = cur.x;
 		
 		double div_p = p / 10;
@@ -453,7 +463,7 @@ void move_cursor(cv::Point cur) {
 		}
 	}
 
-	else if (p == 0) { // y∞Ì¡§
+	else if (p == 0) { // yÍ≥†Ï†ï
 		w = 0;
 		tmp_cursor.y = cur.y;
 
@@ -472,14 +482,14 @@ void move_cursor(cv::Point cur) {
 
 
 
-	}else{ // ¿œπ›
+	}else{ // ?ºÎ∞ò
 
 		double div_q = q / 10;
 
 		if (div_q < 0)
 			div_q = 1;	
 
-		w = (double)p / (double)q; // ±‚øÔ±‚
+		w = (double)p / (double)q; // Í∏∞Ïö∏Í∏?
 		m = -1 * (w*current_cursor.x - current_cursor.y); // y = wx + m --> m = -(wx-y)
 
 		
